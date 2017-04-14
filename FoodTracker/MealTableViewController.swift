@@ -16,10 +16,10 @@ class MealTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = editButtonItem
-        loadSampleMeals()
+        meals = loadMeals() ?? loadSampleMeals()
     }
     
-    private func loadSampleMeals() {
+    private func loadSampleMeals() -> [Meal] {
         
         let photo1 = UIImage(named: "meal1")
         let photo2 = UIImage(named: "meal2")
@@ -37,7 +37,20 @@ class MealTableViewController: UITableViewController {
             fatalError("Unable to instantiate meal2")
         }
         
-        meals += [meal1, meal2, meal3]
+        return [meal1, meal2, meal3]
+    }
+    
+    private func saveMeals() {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(meals, toFile: Meal.ArchiveURL.path)
+        if isSuccessfulSave {
+            os_log("Meals successfully saved.", log: OSLog.default, type: .debug)
+        } else {
+            os_log("Failed to save meals...", log: OSLog.default, type: .error)
+        }
+    }
+    
+    private func loadMeals() -> [Meal]?  {
+        return NSKeyedUnarchiver.unarchiveObject(withFile: Meal.ArchiveURL.path) as? [Meal]
     }
     
     @IBAction func fuckinShit(sender: UIStoryboardSegue) {
@@ -51,6 +64,7 @@ class MealTableViewController: UITableViewController {
                 meals[selection!.row] = meal
                 tableView.reloadRows(at: [selection!], with: .automatic)
             }
+            saveMeals()
         }
     }
 
@@ -90,7 +104,8 @@ class MealTableViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
+        saveMeals()
     }
 
     /*
