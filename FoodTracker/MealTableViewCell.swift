@@ -13,6 +13,8 @@ class MealTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var ratingControl: RatingControl!
+    
+    var meal: Meal?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -23,6 +25,13 @@ class MealTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    func bind(meal: Meal) {
+        self.meal = meal
+        nameLabel.text = meal.name
+        photoImageView.image = meal.photo
+        ratingControl.rating = meal.rating
     }
 
 }
